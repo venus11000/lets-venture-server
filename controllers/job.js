@@ -15,6 +15,7 @@ exports.getJobs = (req, res) => {
     };
 
     (orQuery.length > 0 ? Job.find(query) : Job.find())
+        .sort({ createdAt: -1 })
         .then(response => res.status(200).json(response))
         .catch(err => res.status(400).json({ error: err, message: "something went wrong!" }));
 }
