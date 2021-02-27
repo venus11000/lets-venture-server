@@ -1,20 +1,20 @@
 const Job = require("../models/job");
-const jwt = require("jsonwebtoken");            //  to generate signed user
-const expressJwt = require("express-jwt");      //  for authorization check
 
 exports.getJobs = (req, res) => {
-    let { searchKeyword = "", jobType = "" } = req.query;
+    let { searchKeyword = "", jobType = "", location = "", experience = "" } = req.query;
+
+    let orQuery = [];
+
+    searchKeyword && orQuery.push({ title: { '$regex': searchKeyword, '$options': 'i' } });
+    location && orQuery.push({ location: { '$regex': location, '$options': 'i' } });
+    searchKeyword && orQuery.push({ companyName: { '$regex': searchKeyword, '$options': 'i' } });
+    experience && orQuery.push({ experience: { '$regex': experience, '$options': 'i' } });
+    jobType && orQuery.push({ jobType: { '$in': jobType } });
     let query = {
-        "$or": [
-            { title: { '$regex': searchKeyword, '$options': 'i' } },
-            { location: { '$regex': searchKeyword, '$options': 'i' } },
-            { companyName: { '$regex': searchKeyword, '$options': 'i' } },
-            { experience: { '$regex': searchKeyword, '$options': 'i' } },
-            { jobType: { '$in': jobType } }
-        ]
+        "$and": orQuery
     };
 
-    Job.find(query)
+    (orQuery.length > 0 ? Job.find(query) : Job.find())
         .then(response => res.status(200).json(response))
         .catch(err => res.status(400).json({ error: err, message: "something went wrong!" }));
 }
