@@ -5,13 +5,13 @@ exports.getJobs = (req, res) => {
 
     let orQuery = [];
 
-    searchKeyword && orQuery.push({ title: { '$regex': searchKeyword, '$options': 'i' } });
-    location && orQuery.push({ location: { '$regex': location, '$options': 'i' } });
-    searchKeyword && orQuery.push({ companyName: { '$regex': searchKeyword, '$options': 'i' } });
-    experience && orQuery.push({ experience: { '$regex': experience, '$options': 'i' } });
+    searchKeyword && orQuery.push({ title: { '$regex': searchKeyword.trim(), '$options': 'i' } });
+    location && orQuery.push({ location: { '$regex': location.trim(), '$options': 'i' } });
+    searchKeyword && orQuery.push({ companyName: { '$regex': searchKeyword.trim(), '$options': 'i' } });
+    experience && orQuery.push({ experience: { '$regex': experience.trim(), '$options': 'i' } });
     jobType && orQuery.push({ jobType: { '$in': jobType } });
     let query = {
-        "$and": orQuery
+        "$or": orQuery
     };
 
     (orQuery.length > 0 ? Job.find(query) : Job.find())
